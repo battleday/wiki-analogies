@@ -6,13 +6,11 @@ import os
 import matplotlib.pyplot as plt
 import math
 import numpy as np
-import argparse
 
 # In[2]:
 
 
 def draw_multinomial(num_entities, zeta):
-    # 
     draws = np.random.multinomial(1, pvals=zeta, size=num_entities)
     z = np.argmax(draws, axis = 1)
     return z
@@ -21,15 +19,15 @@ def draw_interaction(eta):
     return np.random.binomial(1, eta)
 
 def draw_system_parameters(config):
-    print('drawing wiki parameters')
+    print('drawing system parameters')
     systemParams = np.load(config['load_path'], allow_pickle=True)
     eta = systemParams['intMat']
     zeta = systemParams['freqVec']
     return eta, zeta
 
 def create_dataset(num_entities, interactionMatrix, frequencyVector):
-    """Samples 100 start points from frequencyVector
-    Samples 100 end points from frequencyVector
+    """Samples num_entities start points from frequencyVector
+    Samples num_entities end points from frequencyVector
     Derives edges between them exhaustively from interactionMatrix
     Shuffles and splits into test and train
     Partitions train according to percentage of data observed."""
@@ -74,11 +72,6 @@ def save_dataset(dataPerm, config, split_size, num_splits=10):
     testRange = np.array([0, split_size])
     np.savez('{}.npz'.format(config['save_path']), fullData = dataPerm, testRange=testRange, 
             trainRanges=trainRanges)
- 
-
-
-# In[3]:
-
 
 num_entities = 30
 loadDir = '/tigress/ruairidh/AAAI_2020/WIKIdata/matrices2020'
@@ -104,17 +97,4 @@ for file in domains:
         dM = create_dataset(config['num_entities'], eta, zeta)
         dP, split_size = split_dataset(config['num_entities'], dM)
         save_dataset(dP, config, split_size)
-
-
-# In[4]:
-
-
-# dM = create_dataset(100, np.random.rand(2,2), np.ones((2))/2)
-# dP, split_size = split_dataset(100, dM)
-# save_dataset(dP, {'save_path': './WIKIdata/testing'}, split_size)
-
-# # i = np.random.choice(np.arange(9))
-# # tM = np.load('./WIKIdata/testing_train_{}.npy'.format(i))
-# # print(tM.shape)
-# # print(tM[:10])
 
