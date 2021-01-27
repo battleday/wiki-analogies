@@ -73,13 +73,16 @@ def save_dataset(dataPerm, config, split_size, num_splits=10):
     np.savez('{}.npz'.format(config['save_path']), fullData = dataPerm, testRange=testRange, 
             trainRanges=trainRanges)
 
-num_entities = 30
-loadDir = '/tigress/ruairidh/AAAI_2020/WIKIdata/matrices2020'
-saveDir = '/tigress/ruairidh/AAAI_2020/data/domains'
+num_entities = 100 # [30, 100]
+loadDir = '/tigress/ruairidh/cogsci2021analogy/WIKIdata/matrices2020'
+saveDir = '/tigress/ruairidh/cogsci2021analogy/data/domains'
 domains = os.listdir(loadDir)
 for file in domains:
+    print(file)
     filename = file.replace('.npz', '')
-    if '.DS' in file:
+    #if '.DS' in file:
+    if ('.DS' in filename) or ('wiki' in filename):
+        print("wiki or DS; skipping")
         continue
     try:
         os.makedirs('{}/{}'.format(saveDir, filename))
@@ -90,9 +93,11 @@ for file in domains:
     savePath = '{}/{}/{}_entities_data'.format(saveDir, filename, num_entities)
     config = {'num_entities': num_entities, 'save_path': savePath, 'load_path': loadPath}
     
-    if os.path.exists('{}_test.npy'.format(savePath)):
+    if os.path.exists('{}.npz'.format(savePath)):
+        print("path already exists; moving on")
         continue
     else:
+        print("drawing params")
         eta, zeta = draw_system_parameters(config)
         dM = create_dataset(config['num_entities'], eta, zeta)
         dP, split_size = split_dataset(config['num_entities'], dM)
